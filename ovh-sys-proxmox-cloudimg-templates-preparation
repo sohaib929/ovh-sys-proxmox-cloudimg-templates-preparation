@@ -1,0 +1,86 @@
+# Prerequisites:
+# - OVH/SoYouStart IPS
+# - OVH/SoYouStart Dedivated Server
+# 
+
+* Step 1 (GUI)
+  Chose an ip for each cloud image template amd create Virtual MACs from OVH/SoYouStart Manager
+
+* Step 2 (CLI)
+  # cd /var/lib/vz
+  # mkdir tmp
+  # cd tmp
+  # wget https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+  # wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img	
+  
+* Step 3 (CLI)
+  # qm create 1001 --memory 2048 --net0 virtio,bridge=vmbr0
+  # qm create 1002 --memory 2048 --net0 virtio,bridge=vmbr0
+  
+* Step 4 (CLI)
+  # qm importdisk 1001 bionic-server-cloudimg-amd64.img local
+  # qm importdisk 1002 focal-server-cloudimg-amd64.img local
+  # rm bionic-server-cloudimg-amd64.img focal-server-cloudimg-amd64.img
+  # cd .. && rmdir tmp
+  
+* Step 5 (CLI)
+  # qm set 1001 --scsihw virtio-scsi-pci --scsi0 local:vm-1001-disk-0
+  # qm set 1002 --scsihw virtio-scsi-pci --scsi0 local:vm-1002-disk-0
+  
+* Step 6 (CLI)
+  # qm set 1001 --ide1 local:cloudinit
+  # qm set 1002 --ide1 local:cloudinit
+  
+* Step 7 (CLI)
+  # qm set 1001 --serial1 socket --vga serial1
+  # qm set 1002 --serial1 socket --vga serial1
+  
+* Step 8 (CLI)
+  # reboot
+  
+* Step 9 (GUI)
+  Configure cloudinit
+  - IP Config
+    IP: Chose an ip from your OVH Additional IPs
+    Gateway: is the dedicated server ip network address with mask of 24 and ip 254
+  - User
+  - SSH Public Key
+  - DNS Domain
+  - DNS Server: 213.186.33.99 8.8.8.8
+  
+* Step 10 (GUI)
+  Network card type (E1000)
+  Network mac address (The generated MAC address for the selected OVH Additional IPs)
+  
+* Step 11 (GUI) - Not needed
+  Extend Disk space by 3 Giga
+
+* Step 12 (GUI)
+  Configure Options
+  - Rename VMs
+  - QEMU Guest Agent
+  - Boot Order
+  
+* Step 13 (GUI)
+  Start VM
+  
+* Step 14 (CLI)
+  # vi /etc/netplan/90-ovh-routes.yaml
+  """
+  network:
+    version: 2
+    ethernets:
+        eth0:
+            routes:
+              - to: XX.XX.XX.254/32
+                via: 0.0.0.0
+                scope: link
+  """
+  # netplan apply
+  # ping 8.8.8.8
+  # apt update
+  # apt install qemu-guest-agent
+  # reboot
+
+* Step 14 (GUI)
+  Convert to template
