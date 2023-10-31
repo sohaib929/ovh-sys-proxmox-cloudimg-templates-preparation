@@ -12,7 +12,8 @@
   # mkdir tmp
   # cd tmp
   # wget https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
-  # wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img	
+  # wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+  # wget https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
   
 * Step 3 (CLI)
   # qm create 1001 --memory 2048 --net0 virtio,bridge=vmbr0
